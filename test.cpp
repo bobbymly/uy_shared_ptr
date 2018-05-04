@@ -12,7 +12,7 @@ public:
 
     void t_func()
     {
-        cout<<"test the operator -> "<<endl;
+        cout<<"test the operator -> , sucess"<<endl;
     }
 
     ~uy_t()

@@ -7,7 +7,6 @@ class uy_shared_ptr_base
 {
 public:
     uy_shared_ptr_base(T* target):point(target),count(1){   }
-//    uy_shared_ptr_base(uy_shared_ptr_base<T> target):point(target.point),count(){   }
     T* get(){  return point;}
 
     void hold(){  count++;}
@@ -50,9 +49,9 @@ public:
     uy_shared_ptr(const T& target):base(new uy_shared_ptr_base<T>(new T(target)) ){ }
     uy_shared_ptr(uy_shared_ptr<T>& target):base(target.base){  base -> hold(); }
 
-    uy_shared_ptr_base<T> * get(){  return base;}
+    uy_shared_ptr_base<T> * get(){  return base->get();}
     
-    operator -> (){ return base->operator -> ();}
+    T* operator -> (){ return base -> operator -> ();}
     
     T& operator * (){   return **base;}
 
@@ -69,7 +68,7 @@ public:
     uy_shared_ptr<T>& operator = (uy_shared_ptr<T2> target)
     {
         base -> release();
-        base = target.get();
+        base = target.base;
         base -> hold();
         return *this;
     }
