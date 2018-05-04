@@ -1,12 +1,26 @@
 #include <iostream>
 #include <atomic>
+#include <functional>
 using namespace std;
+
+
+class DefaultDeleter
+{
+public:
+    template <class T>
+    void operator ()(T* ptr)
+    {
+        delete ptr;
+    }
+};
+
 
 template <class T>
 class uy_shared_ptr_base
 {
 public:
-    explicit uy_shared_ptr_base(T* target):point(target),count(1){   }
+    template <class D = DefaultDeleter>
+    explicit uy_shared_ptr_base(T* target,D deleter_ = D()):point(target),count(1),deleter(deleter_){   }
     T* get(){  return point;}
 
     void hold(){  count++;}
@@ -27,7 +41,7 @@ public:
     void destroy()
     {
         //point -> ~T();
-        delete point;
+        deleter(point);
     }
 
 
@@ -36,7 +50,7 @@ private:
 
     //使用 atomic 保证对引用计数操作的原子性，为多线程环境做准备
     atomic<unsigned int> count;
-
+    function<void (T*)>deleter;
 
 
 
@@ -95,6 +109,8 @@ public:
         base -> release();
     }
 
+    static uy_shared_ptr<T> make_shared(T&)
+    :base(new uy_shared_ptr_base<T>(new T(target)) ){ }
     
 private:
     uy_shared_ptr_base<T> *base; 
