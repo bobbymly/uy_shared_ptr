@@ -33,6 +33,8 @@ public:
 
 private:
     T* point = NULL;
+
+    //使用 atomic 保证对引用计数操作的原子行
     atomic<unsigned int> count;
 
 
