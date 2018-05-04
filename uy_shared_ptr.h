@@ -6,7 +6,7 @@ template <class T>
 class uy_shared_ptr_base
 {
 public:
-    uy_shared_ptr_base(T* target):point(target),count(1){   }
+    explicit uy_shared_ptr_base(T* target):point(target),count(1){   }
     T* get(){  return point;}
 
     void hold(){  count++;}
@@ -34,7 +34,7 @@ public:
 private:
     T* point = NULL;
 
-    //使用 atomic 保证对引用计数操作的原子行
+    //使用 atomic 保证对引用计数操作的原子性，为多线程环境做准备
     atomic<unsigned int> count;
 
 
@@ -47,9 +47,9 @@ template <class T>
 class uy_shared_ptr
 {
 public:
-    uy_shared_ptr():base(new uy_shared_ptr_base<T>( new T())){    }
-    uy_shared_ptr(const T& target):base(new uy_shared_ptr_base<T>(new T(target)) ){ }
-    uy_shared_ptr(uy_shared_ptr<T>& target):base(target.base){  base -> hold(); }
+    explicit uy_shared_ptr():base(new uy_shared_ptr_base<T>( new T())){    }
+    explicit uy_shared_ptr(const T& target):base(new uy_shared_ptr_base<T>(new T(target)) ){ }
+    explicit uy_shared_ptr(uy_shared_ptr<T>& target):base(target.base){  base -> hold(); }
 
     uy_shared_ptr_base<T> * get(){  return base->get();}
     
@@ -58,7 +58,7 @@ public:
     T& operator * (){   return **base;}
 
     template <class T2>
-    uy_shared_ptr(const uy_shared_ptr<T2> target)
+    explicit uy_shared_ptr(const uy_shared_ptr<T2> target)
     {
         base -> release();
         base = target.base;
