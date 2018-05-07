@@ -10,6 +10,12 @@ public:
         cout<<"uy_t()"<<endl;
     }
 
+
+    uy_t(const uy_t & target)
+    {
+        cout<<"copy uy_t"<<endl;
+    }
+
     void t_func()
     {
         cout<<"test the operator -> , sucess"<<endl;
@@ -33,7 +39,7 @@ void func1()
 {
     
 
-    uy_shared_ptr<uy_t> test;
+    uy_shared_ptr<uy_t> test(new uy_t());
     test -> t_func();
 
 
@@ -42,6 +48,8 @@ void func1()
 
     cout<<" func2 begin"<<endl;
     func2(test);
+    cout<<"counts = "<<test.count()<<endl;
+    uy_shared_ptr<uy_t> test3 = test;
     
 
     cout<<" func2 end"<<endl;

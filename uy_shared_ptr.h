@@ -21,6 +21,7 @@ class uy_shared_ptr_base
 public:
     template <class D = DefaultDeleter>
     explicit uy_shared_ptr_base(T* target,D deleter_ = D()):point(target),count(1),deleter(deleter_){   }
+
     T* get(){  return point;}
 
     void hold(){  count++;}
@@ -62,8 +63,11 @@ class uy_shared_ptr
 {
 public:
     explicit uy_shared_ptr():base(new uy_shared_ptr_base<T>( new T())){    }
-    explicit uy_shared_ptr(const T& target):base(new uy_shared_ptr_base<T>(new T(target)) ){ }
-    explicit uy_shared_ptr(uy_shared_ptr<T>& target):base(target.base){  base -> hold(); }
+    
+    template <class D = DefaultDeleter>
+    uy_shared_ptr(T* target,D deleter_ = D()):base(new uy_shared_ptr_base<T>(target,deleter_) ){    }
+
+    uy_shared_ptr(uy_shared_ptr<T>& target):base(target.base){  base -> hold(); }
 
     uy_shared_ptr_base<T> * get(){  return base->get();}
     
@@ -109,8 +113,8 @@ public:
         base -> release();
     }
 
-    static uy_shared_ptr<T> make_shared(T&)
-    :base(new uy_shared_ptr_base<T>(new T(target)) ){ }
+    // static uy_shared_ptr<T> make_shared(T& target)
+    // :base(new uy_shared_ptr_base<T>(new T(target)) ){ }
     
 private:
     uy_shared_ptr_base<T> *base; 
