@@ -69,7 +69,6 @@ int main()
     }
     cout<<"over"<<endl;
 
-  //  uy_t temp;
     uy_shared_ptr<uy_t> test = make_shared<uy_t>();
 
 
