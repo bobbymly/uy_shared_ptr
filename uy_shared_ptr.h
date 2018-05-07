@@ -4,23 +4,32 @@
 using namespace std;
 
 
-class DefaultDeleter
+// class DefaultDeleter
+// {
+// public:
+//     template <class T>
+//     void operator ()(T* ptr)
+//     {
+//         delete ptr;
+//     }
+// };
+
+
+// 默认删除器 
+template<class T>
+void DefaultDeleter(T* ptr)
 {
-public:
-    template <class T>
-    void operator ()(T* ptr)
-    {
-        delete ptr;
-    }
-};
+    delete ptr;
+}
 
 
+//直接管理对象指针的核心类
 template <class T>
 class uy_shared_ptr_base
 {
 public:
-    template <class D = DefaultDeleter>
-    explicit uy_shared_ptr_base(T* target,D deleter_ = D()):point(target),count(1),deleter(deleter_){   }
+
+    explicit uy_shared_ptr_base(T* target,function<void(T*)> deleter_ = DefaultDeleter<T>):point(target),count(1),deleter(deleter_){   }
 
     T* get(){  return point;}
 
@@ -49,7 +58,7 @@ public:
 private:
     T* point = NULL;
 
-    //使用 atomic 保证对引用计数操作的原子性，为多线程环境做准备
+    //使用 atomic 保证对引用计数操作的原子性，为多线程环境下的线程安全做准备
     atomic<unsigned int> count;
     function<void (T*)>deleter;
 
@@ -58,16 +67,17 @@ private:
 };
 
 
+//上一级包装
 template <class T>
 class uy_shared_ptr
 {
 public:
     explicit uy_shared_ptr():base(new uy_shared_ptr_base<T>( new T())){    }
     
-    template <class D = DefaultDeleter>
-    uy_shared_ptr(T* target,D deleter_ = D()):base(new uy_shared_ptr_base<T>(target,deleter_) ){    }
+    //template <class D = DefaultDeleter>
+    uy_shared_ptr(T* target,function<void(T*)> deleter_ = DefaultDeleter<T>):base(new uy_shared_ptr_base<T>(target,deleter_) ){    }
 
-    uy_shared_ptr(uy_shared_ptr<T>& target):base(target.base){  base -> hold(); }
+    uy_shared_ptr(const uy_shared_ptr<T>& target):base(target.base){  base -> hold(); }
 
     uy_shared_ptr_base<T> * get(){  return base->get();}
     
@@ -76,7 +86,7 @@ public:
     T& operator * (){   return **base;}
 
     template <class T2>
-    explicit uy_shared_ptr(const uy_shared_ptr<T2> target)
+    explicit uy_shared_ptr(const uy_shared_ptr<T2> &target)
     {
         base -> release();
         base = target.base;
@@ -85,7 +95,7 @@ public:
 
 
     template <class T2>
-    uy_shared_ptr<T>& operator = (uy_shared_ptr<T2> target)
+    uy_shared_ptr<T>& operator = (uy_shared_ptr<T2> &target)
     {
         base -> release();
         base = target.base;
@@ -113,9 +123,16 @@ public:
         base -> release();
     }
 
-    // static uy_shared_ptr<T> make_shared(T& target)
-    // :base(new uy_shared_ptr_base<T>(new T(target)) ){ }
+
     
 private:
     uy_shared_ptr_base<T> *base; 
 };
+
+
+template <class T,class ... Args>
+static uy_shared_ptr<T> make_shared(Args&&... args)
+{
+    T *ptr = new T(std::forward<T>(args)...);
+    return uy_shared_ptr<T>(ptr);
+}
