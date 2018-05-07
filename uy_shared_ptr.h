@@ -4,15 +4,6 @@
 using namespace std;
 
 
-// class DefaultDeleter
-// {
-// public:
-//     template <class T>
-//     void operator ()(T* ptr)
-//     {
-//         delete ptr;
-//     }
-// };
 
 
 // 默认删除器 ，在使用动态数组时应自定义一个删除器，数组期待的是 delete[]
@@ -109,9 +100,9 @@ public:
         return base -> release();
     }
 
-    bool reset(const T& target)
+    bool reset(uy_shared_ptr<T>& target)
     {   
-        base ->relese();
+        base ->release();
         base = target.base;
         base -> hold();
 

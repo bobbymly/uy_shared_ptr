@@ -120,6 +120,21 @@ void test_deleter()
 
 }
 
+void test_reset()
+{
+    uy_shared_ptr<uy_t> test;
+    test.reset();
+    uy_shared_ptr<double> test2(new double(2.222));
+    uy_shared_ptr<double> test3(new double(3.333));
+    cout<<"test2 = "<<*test2<<endl;
+    cout<<"test3 = "<<*test3<<endl;
+    cout<<"after test2.reset(test3)"<<endl;
+    test2.reset(test3);
+    cout<<"test2 = "<<*test2<<endl;
+    cout<<"test2.count() = "<<test2.count()<<endl;
+    
+}
+
 
 
 int main()
@@ -134,6 +149,6 @@ int main()
     test_swap();
     test_count();
     test_deleter();
-
+    test_reset();
     return 0;
 }
