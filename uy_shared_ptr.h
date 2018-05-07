@@ -56,6 +56,7 @@ public:
 
 
 private:
+
     T* point = NULL;
 
     //使用 atomic 保证对引用计数操作的原子性，为多线程环境下的线程安全做准备
@@ -68,7 +69,7 @@ private:
 
 
 
-template <class T>
+template <typename T>
 class uy_shared_ptr
 {
 public:
@@ -95,7 +96,7 @@ public:
 
 
     template <class T2>
-    uy_shared_ptr<T>& operator = (uy_shared_ptr<T2> &target)
+    uy_shared_ptr<T>& operator = (const uy_shared_ptr<T2> &target)
     {
         base -> release();
         base = target.base;
@@ -121,6 +122,11 @@ public:
     ~uy_shared_ptr()
     {
         base -> release();
+    }
+    
+    void swap(uy_shared_ptr<T>& target)
+    {
+        std::swap(target.base,this->base);
     }
 
 
