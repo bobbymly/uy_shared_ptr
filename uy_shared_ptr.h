@@ -15,7 +15,7 @@ using namespace std;
 // };
 
 
-// 默认删除器 
+// 默认删除器 ，在使用动态数组时应自定义一个删除器，数组期待的是 delete[]
 template<class T>
 void DefaultDeleter(T* ptr)
 {
@@ -73,8 +73,8 @@ class uy_shared_ptr
 {
 public:
     explicit uy_shared_ptr():base(new uy_shared_ptr_base<T>( new T())){    }
-    
-    //template <class D = DefaultDeleter>
+
+
     uy_shared_ptr(T* target,function<void(T*)> deleter_ = DefaultDeleter<T>):base(new uy_shared_ptr_base<T>(target,deleter_) ){    }
 
     uy_shared_ptr(const uy_shared_ptr<T>& target):base(target.base){  base -> hold(); }

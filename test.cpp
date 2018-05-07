@@ -71,7 +71,9 @@ int main()
 
     uy_shared_ptr<uy_t> test = make_shared<uy_t>();
 
+    uy_shared_ptr<int> test_int = make_shared<int>(60);
 
+    cout<<"test operator * "<<endl<<*test_int<<endl;
 
 
     return 0;
